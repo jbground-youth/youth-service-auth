@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+    options {
+        timeout(time: 1, unit: 'HOURS')
+    }
+    environment {
+        SOURCECODE_JENKINS_CREDENTIAL_ID = 'github-access-token'
+        SOURCE_CODE_URL = 'https://github.com/jbground/youth-phone-vue.git'
+        RELEASE_BRANCH = 'main'
+    }
+    stages {
+        stage('clone') {
+            steps {
+                git url: "$SOURCE_CODE_URL",
+                    branch: "$RELEASE_BRANCH",
+                    credentialsId: "$SOURCECODE_JENKINS_CREDENTIAL_ID"
+                sh "ls -al"
+            }
+        }
+
+        stage('vue dockerizing') {
+            steps {
+                sh "docker build -f Dockerfile -t youth-service-auth/cmd ."
+            }
+        }
+    }
+}
